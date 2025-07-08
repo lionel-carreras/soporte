@@ -50,7 +50,7 @@ venv/
 # Django stuff:
 *.log
 local_settings.py
-tickets.sqlite3
+#tickets.sqlite3
 db.sqlite3-journal
 
 
