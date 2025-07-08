@@ -1,0 +1,124 @@
+body {
+  background-color: #41414b;
+}
+
+
+.ticket-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 300px;
+  height: 400px;           /* altura fija */
+  background-color: #24233b;
+  border-radius: 8px;
+  box-shadow: 0 10px 10px rgba(73,70,92,0.5);
+  transition: transform 0.3s ease;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+
+/* cabecera igual que antes… */
+.ticket-card .header { padding: 8px; }
+
+/* cuerpo de código ocupa espacio central */
+.ticket-card .code-container {
+  flex: 1;
+  padding: 10px;
+  background-color: #1e1e1e;
+  overflow-y: auto;
+}
+
+/* pie de tarjeta */
+.ticket-card .footer {
+  padding: 8px;
+  display: flex;
+  justify-content: space-between;
+  background: #24233b;
+}
+
+
+.header {
+  padding: 8px;
+}
+.top {
+  display: flex;
+  
+}
+.circle {
+  padding: 0 4px;
+}
+.circle2 {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+/* CORRECCIÓN de los puntos: */
+.red.circle2    { background-color: #ff605c; }
+.yellow.circle2 { background-color: #ffbd44; }
+.green.circle2  { background-color: #00ca4e; }
+
+.title {
+  flex: 1;
+  text-align: center;
+}
+#title2 {
+  color: white;
+  font-family: monospace;
+  font-weight: bold;
+  margin: 0;
+}
+
+/* código: que ocupe todo el espacio intermedio y pueda hacer scroll */
+.code-container {
+  flex: 1;            /* crece para ocupar todo el espacio entre header y footer */
+  padding: 10px;
+  background-color: #1e1e1e;
+  overflow-y: auto;   /* scroll sólo aquí dentro cuando sobrepasa */
+  overflow-x: hidden;
+}
+.code {
+  margin: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  text-align: left;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #ddd;
+}
+
+.code .var {
+  color: #8cdc68; 
+}
+.code .val {
+  color: #ffffff; 
+}
+
+.dashboard-title {
+  display: block;
+  width: 100%;
+  padding: 0.75rem;
+  font-style: oblique;
+  font-family: Consolas, "Courier New", monospace;
+  color: #fff;
+  background-color: #24233b;
+  border-radius: 8px;
+  box-shadow: rgba(100,100,111,0.2) 0px 7px 20px 0px;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+
+.dashboard-subtitle {
+  padding: 0.5rem;
+  font-style: oblique;
+  font-family: Consolas, "Courier New", monospace;
+  color: #fff;
+  background-color: #24233b;
+  border-radius: 6px;
+  text-align: center;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}

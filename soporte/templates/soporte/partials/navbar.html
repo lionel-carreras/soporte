@@ -1,0 +1,107 @@
+{% load static %}
+<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+  <div class="container-fluid">
+    
+    <a class="navbar-brand" href="{% if user.group.name == 'usuario' %}">
+      {% url 'soporte:dashboard_usuario' %}
+    {% else %}
+      {% url 'soporte:dashboard_agente' %}"
+    {% endif %}>
+       <img src="{% static 'images/logo.jpeg' %}" alt="Logo" class="img-fluid" style="max-height: 40px;"></i> Sistema de Tickets
+    </a>
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#mainNav"
+      aria-controls="mainNav"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="mainNav">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        {% if perms.soporte.add_ticket %}
+          <li class="nav-item">
+            <a class="nav-link" href="/soporte/dashboard/admin/create_ticket">
+              <i class="fas fa-plus-circle"></i> Crear Ticket
+            </a>
+          </li>
+        {% endif %}
+
+        {% if perms.soporte.view_ticket %}
+          <li class="nav-item">
+            <a class="nav-link" href="/soporte/dashboard/agentes/">
+              <i class="fa-solid fa-ticket"></i> Tickets
+              
+            </a>
+          </li>
+        {% endif %}
+
+         {% if perms.soporte.view_ticket %}
+            <li class="nav-item">
+              <a class="nav-link" 
+                href="{% url 'soporte:ticket_historico' %}">
+                <i class="fa-solid fa-clock-rotate-left"></i> Historial
+                
+              </a>
+            </li>
+          {% endif %}
+
+        {% if perms.soporte.view_ticket %}
+          <li class="nav-item">
+            <a class="nav-link" href="/admin/">
+              <i class="fas fa-user"></i> Panel Admin
+            </a>
+          </li>
+        {% endif %}
+
+        {% if perms.auth.view_user %}
+          <li class="nav-item">
+            <a class="nav-link" href="/soporte/dashboard/superadmin">
+              <i class="fas fa-chart-bar"></i> Estadísticas
+            </a>
+          </li>
+        {% endif %}
+      </ul>
+
+      <ul class="navbar-nav ms-auto">
+        {% if user.is_authenticated %}
+    <li class="nav-item dropdown">
+      <!-- Toggle del dropdown: no hace logout, solo abre el menú -->
+      <a
+        class="nav-link dropdown-toggle"
+        href="#"
+        id="userMenu"
+        role="button"
+        data-bs-toggle="dropdown"
+        aria-expanded="false"
+      >
+        <i class="fas fa-user"></i> {{ user.username }}
+      </a>
+      <form action="{% url 'logout' %}" method="post" class="d-inline">
+        {% csrf_token %}
+
+      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+        <button type="submit" class="dropdown-item">
+          
+            Cerrar sesión
+        </button>
+          <hr class="dropdown-divider">
+        </li>
+      </ul>
+      </form>
+    </li>
+  {% else %}
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'users:login' %}">
+        <i class="fas fa-sign-in-alt"></i> Iniciar sesión
+      </a>
+    </li>
+  {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>

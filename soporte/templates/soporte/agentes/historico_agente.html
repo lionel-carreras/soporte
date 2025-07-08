@@ -1,0 +1,163 @@
+{% extends 'soporte/app.html' %}
+{% load static tz %}
+
+{% block extra_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% endblock %}
+
+{% block title %}Historial de Tickets{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h1 class="dashboard-title">Historial de Tickets</h1>
+  <a href="{% url 'soporte:dashboard_agente' %}" class="btn btn-secondary mb-4">← Volver</a>
+
+  {# ===== Formulario de filtro ===== #}
+  <form method="get" class="row gy-2 gx-3 align-items-end mb-5">
+    {% now "Y-m-d" as today %}
+    <div class="col-auto">
+      <label for="id_desde" class="form-label">Desde:</label>
+      <input type="date" id="id_desde" name="desde"
+             class="form-control" value="{{ desde }}" max="{{ today }}">
+    </div>
+    <div class="col-auto">
+      <label for="id_hasta" class="form-label">Hasta:</label>
+      <input type="date" id="id_hasta" name="hasta"
+             class="form-control" value="{{ hasta }}" min="{{ desde }}" max="{{ today }}">
+    </div>
+    <div class="col-auto">
+      <button type="submit" class="btn btn-primary">Filtrar</button>
+    </div>
+  </form>
+
+  <div class="row gx-4 gy-4">
+    {# ===== Resueltos ===== #}
+    <div class="col-12 col-md-6">
+      <h6 class="dashboard-subtitle">Resueltos</h6>
+      <div class="d-flex flex-column gap-4 overflow-auto" style="max-height:300vh;">
+        {% for ticket in resueltos %}
+          <div class="ticket-card">
+            <div class="header">
+              <div class="top">
+                <div class="circle"><span class="red circle2"></span></div>
+                <div class="circle"><span class="yellow circle2"></span></div>
+                <div class="circle"><span class="green circle2"></span></div>
+                <div class="title">
+                  <p id="title2">{{ ticket.titulo }}</p>
+                </div>
+              </div>
+            </div>
+            <div class="code-container">
+              <pre class="code">
+<span class="var">Título</span>= <span class="val">'{{ ticket.titulo|escapejs }}'</span>
+<span class="var">Usuario</span>= <span class="val">'{{ ticket.creado_por.username }}'</span>
+<span class="var">Sucursal</span>= <span class="val">'{{ ticket.creado_por.sucursal.nombre|escapejs }}'</span>
+<span class="var">Nombre</span>= <span class="val">'{{ ticket.creado_por.first_name }}'</span>
+<span class="var">Apellido</span>= <span class="val">'{{ ticket.creado_por.last_name }}'</span>
+<span class="var">Fecha Creación</span>= <span class="val">'{{ ticket.fecha_creado|date:"d-m  H:i" }}'</span>
+<span class="var">Estado</span>= <span class="val">'{{ ticket.estado.nombre }}'</span>
+<span class="var">Resuelto por</span>= <span class="val">'{{ ticket.asignado_a.first_name }}'</span>
+<span class="var">Fecha Resolución</span>= <span class="val">'{{ ticket.fecha_actualizado|date:"d-m H:i" }}'</span>
+<span class="var">Descripción</span>= <span class="val">'{{ ticket.descripcion|escapejs }}'</span>
+              </pre>
+
+               <!-- Miniatura si existe -->
+    {% if ticket.imagenes.exists %}
+      <div class="px-2 pt-2">
+        <img src="{{ ticket.imagenes.all.0.imagen.url }}"
+          class="img-fluid rounded"        
+          style="max-height:80px; object-fit:cover;">
+      </div>
+    {% endif %}
+            </div>
+            <div class="footer d-flex justify-content-end">
+              <a href="{% url 'soporte:detail_ticket' ticket.id %}"
+                 class="btn btn-sm btn-outline-light">
+                <i class="fas fa-eye"></i>
+              </a>
+            </div>
+          </div>
+        {% empty %}
+          <p class="text-muted">No hay tickets resueltos en este rango.</p>
+        {% endfor %}
+      </div>
+    </div>
+
+    {# ===== Anulados ===== #}
+    <div class="col-12 col-md-6">
+      <h6 class="dashboard-subtitle">Anulados</h6>
+      <div class="d-flex flex-column gap-4 overflow-auto" style="max-height:300vh;">
+        {% for ticket in anulados %}
+          <div class="ticket-card">
+            {% if ticket.imagenes.exists %}
+              <div class="px-2 pt-2">
+                <img src="{{ ticket.imagenes.all.0.imagen.url }}"
+                     class="img-fluid rounded"
+                     style="max-height:80px; object-fit:cover;">
+              </div>
+            {% endif %}
+            <div class="header">
+              <div class="top">
+                <div class="circle"><span class="red circle2"></span></div>
+                <div class="circle"><span class="yellow circle2"></span></div>
+                <div class="circle"><span class="green circle2"></span></div>
+                <div class="title">
+                  <p id="title2">{{ ticket.titulo }}</p>
+                </div>
+              </div>
+            </div>
+            <div class="code-container">
+              <pre class="code">
+<span class="var">Título</span>= <span class="val">'{{ ticket.titulo|escapejs }}'</span>
+<span class="var">Usuario</span>= <span class="val">{{ ticket.creado_por.username }}</span>
+<span class="var">Sucursal</span>= <span class="val">{{ ticket.creado_por.sucursal.nombre }}</span>
+<span class="var">Fecha Creación</span>= <span class="val">'{{ ticket.fecha_creado|date:"d-m  H:i" }}'</span>
+<span class="var">Anulado</span>= <span class="val">{{ ticket.fecha_actualizado|date:"d-m H:i" }}</span>
+<span class="var">Motivo</span>= <span class="val">{{ ticket.motivo_anulacion }}</span>
+<span class="var">Descripción</span>= <span class="val">'{{ ticket.descripcion|default:"— sin descripción —"|escapejs }}'</span>
+              </pre>
+
+                         <!-- Miniatura si existe -->
+    {% if ticket.imagenes.exists %}
+      <div class="px-2 pt-2">
+        <img src="{{ ticket.imagenes.all.0.imagen.url }}"
+          class="img-fluid rounded"        
+          style="max-height:80px; object-fit:cover;">
+      </div>
+    {% endif %}
+
+    
+            </div>
+            <div class="footer d-flex justify-content-end">
+              <a href="{% url 'soporte:detail_ticket' ticket.id %}"
+                 class="btn btn-sm btn-outline-light">
+                <i class="fas fa-eye"></i>
+              </a>
+            </div>
+          </div>
+        {% empty %}
+          <p class="text-muted">No hay tickets anulados en este rango.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{# scroll-to-top #}
+<button id="scrollTopBtn"
+        class="btn btn-secondary position-fixed"
+        style="bottom: 30px; right: 30px; z-index: 1000; display: none;"
+        aria-label="Subir arriba">↑</button>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('scrollTopBtn');
+    window.addEventListener('scroll', () => {
+      btn.style.display = window.pageYOffset > 200 ? 'block' : 'none';
+    });
+    btn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+</script>
+{% endblock %}
