@@ -1,0 +1,337 @@
+{% extends 'soporte/app.html' %}
+{% load static %}
+
+{% block extra_css %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <style>
+    /* miniaturas en mensajes */
+    .msg-attachment {
+      max-height: 50px;
+      margin: .25rem;
+      border-radius: .25rem;
+      object-fit: cover;
+    }
+    /* contenedor de textarea y dropzone */
+    .msg-container {
+      position: relative;
+    }
+    .msg-container textarea {
+      width: 100%;
+      border: 1px solid #ced4da;
+      border-radius: .25rem;
+      padding: .5rem;
+      box-sizing: border-box;
+      resize: vertical;
+      background: #fff;
+      position: relative;
+      z-index: 2;
+    }
+    /* dropzone oculta hasta dragover */
+    .dropzone {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      border: 2px dashed #555;
+      border-radius: .25rem;
+      background: rgba(0,0,0,0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #888;
+      font-size: .9rem;
+      transition: background .2s, border-color .2s, opacity .2s;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .msg-container.dragover .dropzone {
+      opacity: 1;
+      background: rgba(0,0,0,0.1);
+      border-color: #0d6efd;
+      color: #0d6efd;
+    }
+    /* lista de nombres de archivo */
+    .file-list { margin-top:.5rem; font-size:.85rem; }
+    .file-list li { list-style:none; }
+  </style>
+{% endblock %}
+
+{% block title %}Detalle de Ticket{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <a href="{% url 'soporte:dashboard_agente' %}" class="btn btn-secondary mb-4">← Volver</a>
+
+  {# === BLOQUE DETALLE === #}
+  <div class="code-container mb-5">
+    <div class="header">
+      <div class="top">
+        <div class="circle"><span class="red circle2"></span></div>
+        <div class="circle"><span class="yellow circle2"></span></div>
+        <div class="circle"><span class="green circle2"></span></div>
+        <div class="title">
+          <p id="title2">Ticket #{{ ticket.id }}</p>
+        </div>
+      </div>
+    </div>
+    <pre class="code">
+<span class="var">Título</span>= <span class="val">'{{ ticket.titulo|escapejs }}'</span>
+<span class="var">Estado</span>= <span class="val">'{{ ticket.estado.nombre }}'</span>
+<span class="var">Usuario</span>= <span class="val">'{{ ticket.creado_por.username }}'</span>
+<span class="var">Sucursal</span>= <span class="val">'{{ ticket.creado_por.sucursal.nombre|escapejs }}'</span>
+<span class="var">Nombre</span>= <span class="val">'{{ ticket.creado_por.first_name }}'</span>
+<span class="var">Apellido</span>= <span class="val">'{{ ticket.creado_por.last_name }}'</span>
+<span class="var">Estado</span>= <span class="val">'{{ ticket.estado.nombre }}'</span>
+<span class="var">Agente asignado</span>= <span class="val">'{{ ticket.asignado_a.first_name }}'</span><br>
+<span class="var">Creado</span>= <span class="val">'{{ ticket.fecha_creado|date:"Y-m-d H:i" }}'</span>
+<span class="var">Actualizado</span>= <span class="val">'{{ ticket.fecha_actualizado|date:"Y-m-d H:i" }}'</span>
+{% if ticket.motivo_anulacion %}
+<span class="var">Motivo anulación</span>= <span class="val">'{{ ticket.motivo_anulacion|escapejs }}'</span>
+{% endif %}
+{% if ticket.estado.nombre == 'Reabierto' %}
+<span class="var">Motivo reapertura</span>= <span class="val">'{{ ticket.motivo_reapertura|escapejs }}'</span>
+{% endif %}
+<span class="var">Descripción</span>= <span class="val">'{{ ticket.descripcion|default:"— sin descripción —"|escapejs }}'</span>
+    </pre>
+
+            <!-- Miniatura si existe -->
+    {% if ticket.imagenes.exists %}
+      <div class="px-2 pt-2">
+        <img src="{{ ticket.imagenes.all.0.imagen.url }}"
+          class="img-fluid rounded"        
+          style="max-height:80px; object-fit:cover;">
+      </div>
+    {% endif %}  
+  </div>
+
+
+
+  {# === MENSAJES === #}
+  <h6 class="dashboard-subtitle">Mensajes</h6>
+  <div class="overflow-auto mb-5" style="max-height:60vh;">
+    {% if mensajes %}
+      {% for m in mensajes %}
+        <div class="code-container mb-3">
+          <div class="header">
+            <div class="top">
+              <div class="circle"><span class="red circle2"></span></div>
+              <div class="circle"><span class="yellow circle2"></span></div>
+              <div class="circle"><span class="green circle2"></span></div>
+              <div class="title">
+                <p id="title2">{{ m.emisor.get_full_name|default:m.emisor.username }}</p>
+              </div>
+            </div>
+          </div>
+          <div class="code-container">
+
+
+            <pre class="code">
+<span class="var">Fecha</span>= <span class="val">'{{ m.fecha_envio|date:"Y-m-d H:i" }}'</span>
+<span class="var">Mensaje</span>= <span class="val">'{{ m.contenido|escapejs }}'</span>
+            </pre>
+            {% if m.attachments.count %}
+              <div class="d-flex flex-wrap">
+                {% for att in m.attachments.all %}
+                  {% with url=att.file.url %}
+                  {% with ext4=url|lower|slice:"-4:" ext5=url|lower|slice:"-5:" %}
+                    {% if ext4 in ".png .jpg .gif" or ext5 == ".jpeg" %}
+                      <a href="{{ url }}" target="_blank" class="me-2 mb-2">
+                        <img src="{{ url }}" class="msg-attachment" alt="Imagen adjunta {{ forloop.counter }}">
+                      </a>
+                    {% elif ext4 == ".pdf" %}
+                      <div class="me-2 mb-2 px-2 py-1 bg-secondary text-white small rounded">
+                        <i class="fas fa-file-pdf"></i>
+                        <a href="{{ url }}" target="_blank" class="text-white">
+                          {{ att.file.name|slice:"-20:" }}
+                        </a>
+                      </div>
+                      {% elif ext4 == ".webp" %}
+                      <div class="me-2 mb-2 px-2 py-1 bg-secondary text-white small rounded">
+                        <i class="fas fa-file-webp"></i>
+                        <a href="{{ url }}" target="_blank" class="text-white">
+                          {{ att.file.name|slice:"-20:" }}
+                        </a>
+                      </div>
+                    {% elif ext5 in ".docx" or ext4 == ".doc" %}
+                      <div class="me-2 mb-2 px-2 py-1 bg-secondary text-white small rounded">
+                        <i class="fas fa-file-word"></i>
+                        <a href="{{ url }}" target="_blank" class="text-white">
+                          {{ att.file.name|slice:"-20:" }}
+                        </a>
+                      </div>
+                      
+                    {% elif ext5 in ".xlsx" or ext4 == ".xls" %}
+                      <div class="me-2 mb-2 px-2 py-1 bg-secondary text-white small rounded">
+                        <i class="fas fa-file-excel"></i>
+                        <a href="{{ url }}" target="_blank" class="text-white">
+                          {{ att.file.name|slice:"-20:" }}
+                        </a>
+                      </div>
+                    {% elif ext4 == ".csv" %}
+                      <div class="me-2 mb-2 px-2 py-1 bg-secondary text-white small rounded">
+                        <i class="fas fa-file-csv"></i>
+                        <a href="{{ url }}" target="_blank" class="text-white">
+                          {{ att.file.name|slice:"-20:" }}
+                        </a>
+                      </div>
+                    {% else %}
+                      <div class="me-2 mb-2 px-2 py-1 bg-secondary text-white small rounded">
+                        <i class="fas fa-file"></i>
+                        <a href="{{ url }}" target="_blank" class="text-white">
+                          {{ att.file.name|slice:"-20:" }}
+                        </a>
+                      </div>
+                    {% endif %}
+                  {% endwith %}
+                  {% endwith %}
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p class="text-muted">No hay mensajes aún.</p>
+    {% endif %}
+  </div>
+
+{# === FORMULARIO + BOTÓN “RESUELTO” === #}
+{% if ticket.estado_id == 3 %}
+  <div class="alert alert-warning">
+    Este ticket está cerrado. No puedes enviar mensajes.
+  </div>
+{% elif ticket.asignado_a %}
+  <div class="mb-5">
+    {#  El formulario del mensaje (solo textarea + input files) #}
+    <form id="msgForm"
+          method="post"
+          enctype="multipart/form-data"
+          class="mb-3">
+      {% csrf_token %}
+      {# — SELECT de respuestas predeterminadas — #}
+    {% if is_agent %}
+    <select id="presetResponses"
+            class="form-select form-select-sm mb-2"
+            aria-label="Respuestas predeterminadas">
+      <option value="">– Seleccionar respuesta rápida –</option>
+      {% for r in respuestas %}
+        <option value="{{ r.respuesta|escapejs }}">{{ r.respuesta }}</option>
+      {% endfor %}
+    </select>
+    {% endif %}
+      <div class="msg-container mb-2">
+        {{ form.contenido }}
+        <div class="dropzone">Arrastra archivos aquí</div>
+        <input type="file"
+               id="fileInput"
+               name="attachments"
+               multiple hidden>
+        <ul id="fileList" class="file-list"></ul>
+        
+      </div>
+       
+    </form>
+
+    {#  Fila de botones: agrupamos Adjuntar + Enviar a la izquierda, Resuelto a la derecha #}
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <button type="button"
+                id="attachBtn"
+                class="btn btn-secondary btn-sm me-2">
+          <i class="fas fa-paperclip"></i> Adjuntar
+        </button>
+        <button type="submit"
+                form="msgForm"
+                class="btn btn-primary btn-sm">
+          <i class="fas fa-paper-plane"></i> Enviar
+        </button>
+      </div>
+      {% if is_agent %}
+        <form action="{% url 'soporte:ticket_resolve' ticket.id %}"
+              method="post"
+              class="mb-0">
+          {% csrf_token %}
+          <button type="submit"
+                  class="btn btn-success btn-sm">
+            <i class="fas fa-check"></i> Resuelto
+          </button>
+        </form>
+      {% endif %}
+    </div>
+  </div>
+{% else %}
+  <div class="alert alert-info">
+    En cuanto un agente sea asignado, podrás enviar mensajes.
+  </div>
+{% endif %}
+
+
+  {# === BOTÓN SCROLL-TO-TOP === #}
+  <button id="scrollTopBtn"
+          class="btn btn-secondary position-fixed"
+          style="bottom:30px; right:30px; z-index:1000; display:none;"
+          aria-label="Arriba">↑</button>
+</div>
+
+
+
+<script>
+document.addEventListener('DOMContentLoaded', ()=> {
+  // Scroll-to-top
+  const btn = document.getElementById('scrollTopBtn');
+  window.addEventListener('scroll', ()=> btn.style.display = window.pageYOffset>200 ? 'block' : 'none');
+  btn.addEventListener('click', ()=> window.scrollTo({top:0,behavior:'smooth'}));
+
+  // Drag-&-drop + file picker
+  const msgCon = document.querySelector('.msg-container');
+  const inp    = document.getElementById('fileInput');
+  const list   = document.getElementById('fileList');
+  const attach = document.getElementById('attachBtn');
+
+  attach.addEventListener('click', ()=> inp.click());
+  inp.addEventListener('change', ()=> updateList(Array.from(inp.files)));
+
+  ['dragover','dragenter'].forEach(ev =>
+    msgCon.addEventListener(ev, e=>{ e.preventDefault(); msgCon.classList.add('dragover'); })
+  );
+  msgCon.addEventListener('dragleave', e=>{ e.preventDefault(); msgCon.classList.remove('dragover'); });
+  msgCon.addEventListener('drop', e=>{
+    e.preventDefault();
+    msgCon.classList.remove('dragover');
+    const files = Array.from(e.dataTransfer.files);
+    const dt = new DataTransfer();
+    files.forEach(f=> dt.items.add(f));
+    inp.files = dt.files;
+    updateList(files);
+  });
+
+  function updateList(files){
+    list.innerHTML = '';
+    if(!files.length){
+      list.insertAdjacentHTML('beforeend','<li class="text-muted">No hay archivos</li>');
+    } else {
+      files.forEach(f=>{
+        const li = document.createElement('li');
+        li.textContent = f.name;
+        list.appendChild(li);
+      });
+    }
+  }
+
+  // Copiar respuesta rápida al textarea
+  const select = document.getElementById('presetResponses');
+  const textarea = document.querySelector('.msg-container textarea');
+  if (select && textarea) {
+    select.addEventListener('change', () => {
+      const val = select.value;
+      if (val) {
+        textarea.value = val;
+        textarea.focus();
+      }
+    });
+  }
+});
+</script>
+
+
+{% endblock %}

@@ -1,0 +1,151 @@
+{% extends 'soporte/app.html' %}
+{% load static %}
+
+{% block extra_css %}
+{{ block.super }}
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <style>
+    .ticket-form {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    /* Asegura gap vertical en los cols */
+    .ticket-form .row.g-3 > [class*="col-"] {
+      margin-bottom: 1rem;
+    }
+  </style>
+{% endblock %}
+
+{% block title %}Crear Ticket{% endblock %}
+
+{% block content %}
+<div class="container py-4 ticket-form">
+  <div class="code-container mb-5">
+    <!-- CABECERA -->
+    <div class="header">
+      <div class="top">
+        <div class="circle"><span class="red circle2"></span></div>
+        <div class="circle"><span class="yellow circle2"></span></div>
+        <div class="circle"><span class="green circle2"></span></div>
+        <div class="title"><h6><p id="title2">Nuevo Ticket</p></h6></div>
+      </div>
+    </div>
+
+    <!-- CUERPO: TODO DENTRO DE UN SOLO FORM -->
+    <div class="code-container">
+      {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+      {% endif %}
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="row g-3">
+          <div class="col-12 col-md-6">
+            <label for="id_categoria" class="form-label" style="color: #ffffff;">Categoría</label>
+            <select id="id_categoria" name="categoria" class="form-select" required>
+              <option value="" disabled selected>Seleccione una categoría</option>
+              {% for cat in categorias %}
+                <option value="{{ cat.id }}">{{ cat.nombre }}</option>
+              {% endfor %}
+              <option value="solicitar">No existe la categoría? Solicítala acá</option>
+            </select>
+          </div>
+          <div class="col-12 col-md-6">
+            <label for="id_problema" class="form-label" style="color: #ffffff;">Problema común</label>
+            <select id="id_problema" name="problema" class="form-select" disabled>
+              <option value="" disabled selected>Seleccione un problema</option>
+              {% for problema in problemas %}
+                <option value="{{ problema.id }}" data-categoria="{{ problema.categoria_id }}">
+                  {{ problema.nombre }}
+                </option>
+              {% endfor %}
+              <option value="solicitar_problema">No existe el problema? Solicítalo acá</option>
+            </select>
+          </div>
+          <div class="col-12 col-md-6">
+            <label for="id_ip" class="form-label" style="color: #ffffff;">Tu IP</label>
+            <input
+              type="text"
+              id="id_ip"
+              name="ip"
+              class="form-control"
+              placeholder="colocá tu ip Ej. 192.168.0.1"
+            />
+          </div>
+          <div class="col-12">
+            <label for="id_description" class="form-label" style="color: #ffffff;">Descripción (opcional)</label>
+            <textarea
+              id="id_description"
+              name="description"
+              rows="4"
+              class="form-control"
+              placeholder="Agregá detalles adicionales…"
+            >{{ descripcion_valor }}</textarea>
+          </div>
+         <div class="col-12 col-md-6">
+            <label for="id_imagenes" class="form-label" style="color: #ffffff;">Imágenes del error (máx. 25 MB cada una)</label>
+            <input
+              type="file"
+              id="id_imagenes"
+              name="imagenes"
+              accept="image/*"
+              multiple
+              class="form-control"
+            />
+          </div>
+        </div><br>
+
+        <!-- FOOTER: botones en paralelo -->
+        <div class="footer">
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-paper-plane me-1"></i> Enviar
+          </button>
+          <a href="{% url 'soporte:dashboard_usuario' %}" class="btn btn-secondary">
+            Cancelar
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const categoriaSelect = document.getElementById('id_categoria');
+  const problemaSelect  = document.getElementById('id_problema');
+  const allOptions      = Array.from(problemaSelect.querySelectorAll('option[data-categoria]'));
+
+  categoriaSelect.addEventListener('change', function() {
+    const catId = this.value;
+    problemaSelect.disabled = !catId;
+    problemaSelect.innerHTML = '<option value="" disabled selected>Seleccione un problema</option>';
+    allOptions.forEach(opt => {
+      if (opt.dataset.categoria === catId) {
+        problemaSelect.appendChild(opt);
+      }
+    });
+    problemaSelect.insertAdjacentHTML('beforeend',
+      '<option value="solicitar_problema">No existe el problema? Solicítalo acá</option>'
+    );
+    if (catId === 'solicitar') {
+      window.open(
+        'https://api.whatsapp.com/send?phone=5493413588714&text=Quiero%20agregar%20una%20nueva%20categoría',
+        '_blank'
+      );
+      this.value = '';
+    }
+  });
+
+  problemaSelect.addEventListener('change', function() {
+    if (this.value === 'solicitar_problema') {
+      window.open(
+        'https://api.whatsapp.com/send?phone=5493413588714&text=Quiero%20agregar%20un%20nuevo%20problema%20común',
+        '_blank'
+      );
+      this.value = '';
+    }
+  });
+});
+</script>
+{% endblock %}

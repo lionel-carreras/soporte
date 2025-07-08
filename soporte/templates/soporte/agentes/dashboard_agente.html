@@ -1,0 +1,301 @@
+{% extends 'soporte/app.html' %}
+{% load static %}
+
+{% block extra_css %}
+{{ block.super }}
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% endblock %}
+
+{% block title %}Dashboard Agente{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+  <h2 class="dashboard-title">Mis Tickets</h2>
+
+  <div class="row gx-4">
+
+  
+
+   {# ===== COL 1: ABIERTO O REABIERTO ===== #}
+<div class="col-12 col-md-4 mb-4">
+  <h6 class="dashboard-subtitle">Abiertos</h6>
+  <div class="d-flex flex-column gap-4 overflow-auto" style="max-height:300vh;">
+    {% for ticket in pendientes %}
+      <div class="ticket-card">
+
+        <!-- cabecera -->
+        <div class="header">
+          <div class="top">
+            <div class="circle"><span class="red circle2"></span></div>
+            <div class="circle"><span class="yellow circle2"></span></div>
+            <div class="circle"><span class="green circle2"></span></div>
+            <div class="title">
+              <p id="title2">ticket_{{ ticket.id }}</p>
+            </div>
+          </div>
+        </div>
+        <!-- contenido -->
+        <div class="code-container">
+          <pre class="code">
+<span class="var">Título</span>= <span class="val">'{{ ticket.titulo|escapejs }}'</span>
+<span class="var">Usuario</span>= <span class="val">'{{ ticket.creado_por.username }}'</span>
+<span class="var">Sucursal</span>= <span class="val">'{{ ticket.creado_por.sucursal.nombre|escapejs }}'</span>
+<span class="var">Nombre</span>= <span class="val">'{{ ticket.creado_por.first_name }}'</span>
+<span class="var">Apellido</span>= <span class="val">'{{ ticket.creado_por.last_name }}'</span>
+<span class="var">Fecha</span>= <span class="val">'{{ ticket.fecha_creado|date:"Y-m-d" }}'</span>
+<span class="var">Estado</span>= <span class="val">'{{ ticket.estado.nombre }}'</span>
+{% if ticket.estado.nombre == 'Reabierto' %}
+<span class="var">Reabierto por</span>= <span class="val">'{{ ticket.asignado_a.username }}'</span>
+<span class="var">Motivo</span>= <span class="val">'{{ ticket.motivo_reapertura|escapejs }}'</span>
+{% endif %}
+<span class="var">Descripción</span>= <span class="val">'{{ ticket.descripcion|escapejs }}'</span>
+          </pre>
+          <!-- Miniatura si existe -->
+    {% if ticket.imagenes.exists %}
+      <div class="px-2 pt-2">
+        <img src="{{ ticket.imagenes.all.0.imagen.url }}"
+          class="img-fluid rounded"        
+          style="max-height:80px; object-fit:cover;">
+      </div>
+    {% endif %}
+
+        </div>
+        <!-- pie -->
+        <div class="footer d-flex justify-content-between mt-2">
+          <form action="{% url 'soporte:ticket_assign' ticket.id %}" method="post" class="d-flex">
+            {% csrf_token %}
+            <select name="agente_id" class="form-select form-select-sm me-1" required>
+              <option value="" disabled selected>Asignar…</option>
+              {% for ag in agentes %}
+                <option value="{{ ag.id }}">{{ ag.username }}</option>
+              {% endfor %}
+            </select>
+            <button class="btn btn-sm btn-primary">
+              <i class="fas fa-user-plus"></i>
+            </button>
+          </form>
+          <div class="d-flex gap-1">
+            <a href="{% url 'soporte:detail_ticket' ticket.id %}" class="btn btn-sm btn-outline-light">
+              <i class="fas fa-eye"></i>
+            </a>
+            <button class="btn btn-sm btn-danger"
+                    data-bs-toggle="modal"
+                    data-bs-target="#anularModal"
+                    data-action-url="{% url 'soporte:ticket_anular_agente' ticket.id %}">
+              <i class="fas fa-ban"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <p class="text-muted">No hay tickets pendientes.</p>
+    {% endfor %}
+  </div>
+</div>
+
+
+    {# ===== COL 2: ASIGNADOS ===== #}
+    <div class="col-12 col-md-4 mb-4">
+      <h6 class="dashboard-subtitle">Asignados</h6>
+      <div class="d-flex flex-column gap-4 overflow-auto" style="max-height:300vh;">
+        {% for ticket in asignados %}
+          <div class="ticket-card">
+
+            <div class="header">
+              <div class="top">
+                <div class="circle"><span class="red circle2"></span></div>
+                <div class="circle"><span class="yellow circle2"></span></div>
+                <div class="circle"><span class="green circle2"></span></div>
+                <div class="title">
+                  <p id="title2">ticket_{{ ticket.id }}</p>
+                </div>
+              </div>
+            </div>
+            <div class="code-container">
+              <pre class="code">
+<span class="var">Título</span>= <span class="val">'{{ ticket.titulo|escapejs }}'</span>
+<span class="var">Usuario</span>= <span class="val">'{{ ticket.creado_por.username }}'</span>
+<span class="var">Sucursal</span>= <span class="val">'{{ ticket.creado_por.sucursal.nombre|escapejs }}'</span>
+<span class="var">Nombre</span>= <span class="val">'{{ ticket.creado_por.first_name }}'</span>
+<span class="var">Apellido</span>= <span class="val">'{{ ticket.creado_por.last_name }}'</span>
+<span class="var">Fecha</span>= <span class="val">'{{ ticket.fecha_creado|date:"Y-m-d" }}'</span>
+<span class="var">Estado</span>= <span class="val">'{{ ticket.estado.nombre }}'</span>
+<span class="var">Agente asignado</span>= <span class="val">'{{ ticket.asignado_a.first_name }}'</span><br>
+<span class="var">Descripción</span>= <span class="val">'{{ ticket.descripcion|escapejs }}'</span>
+              </pre>
+
+               <!-- Miniatura si existe -->
+    {% if ticket.imagenes.exists %}
+      <div class="px-2 pt-2">
+        <img src="{{ ticket.imagenes.all.0.imagen.url }}"
+          class="img-fluid rounded"        
+          style="max-height:80px; object-fit:cover;">
+      </div>
+    {% endif %}
+
+            </div>
+            <div class="footer d-flex justify-content-between mt-2">
+              <div class="d-flex gap-2">
+                <form action="{% url 'soporte:ticket_assign' ticket.id %}" method="post" class="d-flex">
+                  {% csrf_token %}
+                  <select name="agente_id" class="form-select form-select-sm me-1" required>
+                    <option value="" disabled selected>Reasignar…</option>
+                    {% for ag in agentes %}
+                      <option value="{{ ag.id }}">{{ ag.username }}</option>
+                    {% endfor %}
+                  </select>
+                  <button class="btn btn-sm btn-primary"><i class="fas fa-user-edit"></i></button>
+                </form>
+                
+              </div>
+              <div class="d-flex gap-1">
+                <a href="{% url 'soporte:detail_ticket' ticket.id %}" class="btn btn-sm btn-outline-light">
+                  <i class="fas fa-eye"></i>
+                </a>
+                <button class="btn btn-sm btn-danger"
+                        data-bs-toggle="modal"
+                        data-bs-target="#anularModal"
+                        data-action-url="{% url 'soporte:ticket_anular_agente' ticket.id %}">
+                  <i class="fas fa-ban"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        {% empty %}
+          <p class="text-muted">No tienes tickets asignados.</p>
+        {% endfor %}
+      </div>
+    </div>
+
+    {# ===== COL 3: RESUELTOS HOY ===== #}
+    <div class="col-12 col-md-4 mb-4">
+      <h6 class="dashboard-subtitle">Resueltos Hoy</h6>
+      <div class="d-flex flex-column gap-4 overflow-auto" style="max-height:300vh;">
+        {% for ticket in resueltos %}
+          <div class="ticket-card">
+
+            <div class="header">
+              <div class="top">
+                <div class="circle"><span class="red circle2"></span></div>
+                <div class="circle"><span class="yellow circle2"></span></div>
+                <div class="circle"><span class="green circle2"></span></div>
+                <div class="title">
+                  <p id="title2">ticket_{{ ticket.id }}</p>
+                </div>
+              </div>
+            </div>
+            <div class="code-container">
+              <pre class="code">
+<span class="var">Título</span>= <span class="val">'{{ ticket.titulo|escapejs }}'</span>
+<span class="var">Usuario</span>= <span class="val">'{{ ticket.creado_por.username }}'</span>
+<span class="var">Sucursal</span>= <span class="val">'{{ ticket.creado_por.sucursal.nombre|escapejs }}'</span>
+<span class="var">Nombre</span>= <span class="val">'{{ ticket.creado_por.first_name }}'</span>
+<span class="var">Apellido</span>= <span class="val">'{{ ticket.creado_por.last_name }}'</span>
+<span class="var">Fecha</span>= <span class="val">'{{ ticket.fecha_creado|date:"Y-m-d" }}'</span>
+<span class="var">Estado</span>= <span class="val">'{{ ticket.estado.nombre }}'</span>
+<span class="var">Resuelto por</span>= <span class="val">'{{ ticket.asignado_a.first_name }}'</span><br>
+<span class="var">Descripción</span>= <span class="val">'{{ ticket.descripcion|escapejs }}'</span>
+              </pre>
+
+               <!-- Miniatura si existe -->
+    {% if ticket.imagenes.exists %}
+      <div class="px-2 pt-2">
+        <img src="{{ ticket.imagenes.all.0.imagen.url }}"
+          class="img-fluid rounded"        
+          style="max-height:80px; object-fit:cover;">
+      </div>
+    {% endif %}
+
+    
+            </div>
+            <div class="footer d-flex justify-content-end mt-2 gap-1">
+              <a href="{% url 'soporte:detail_ticket' ticket.id %}" class="btn btn-sm btn-outline-light">
+                <i class="fas fa-eye"></i>
+              </a>
+              <button class="btn btn-sm btn-warning"
+                      data-bs-toggle="modal"
+                      data-bs-target="#reopenModal"
+                      data-action-url="{% url 'soporte:ticket_reopen' ticket.id %}">
+                <i class="fas fa-rotate-left"></i>
+              </button>
+            </div>
+          </div>
+        {% empty %}
+          <p class="text-muted">No hay tickets resueltos hoy.</p>
+        {% endfor %}
+      </div>
+    </div>
+
+
+
+
+{# Modal para reapertura #}
+<div class="modal fade" id="reopenModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="reopenForm" method="post">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title">Motivo de reapertura</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <textarea id="reopenMotivo" name="motivo" class="form-control" rows="3" required></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-warning">Reabrir</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{# Modal para anulación #}
+  <div class="modal fade" id="anularModal" tabindex="-1" aria-labelledby="anularModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="anularForm" method="post">
+          {% csrf_token %}
+          <div class="modal-header">
+            <h5 class="modal-title" id="anularModalLabel">Motivo de anulación</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            <textarea id="anularMotivo" name="motivo" class="form-control" rows="3" required></textarea>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-danger">Anular</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+ 
+<script>
+  const reopenModal = document.getElementById('reopenModal');
+  reopenModal.addEventListener('show.bs.modal', e => {
+    document.getElementById('reopenForm').action = e.relatedTarget.getAttribute('data-action-url');
+    document.getElementById('reopenMotivo').value = '';
+  });
+
+  // Anular
+    document.getElementById('anularModal').addEventListener('show.bs.modal', function(e) {
+      const url = e.relatedTarget.getAttribute('data-action-url');
+      document.getElementById('anularForm').action = url;
+      document.getElementById('anularMotivo').value = '';
+    });
+
+    // Reabrir
+    document.getElementById('reopenModal').addEventListener('show.bs.modal', function(e) {
+      const url = e.relatedTarget.getAttribute('data-action-url');
+      document.getElementById('reopenForm').action = url;
+      document.getElementById('reopenMotivo').value = '';
+    });
+
+</script>
+{% endblock %}
+
+
