@@ -134,10 +134,10 @@
                 {% for att in m.attachments.all %}
                   {% with url=att.file.url %}
                   {% with ext4=url|lower|slice:"-4:" ext5=url|lower|slice:"-5:" %}
-                    {% if ext4 in ".png .jpg .gif" or ext5 == ".jpeg" %}
-                      <a href="{{ url }}" target="_blank" class="me-2 mb-2">
-                        <img src="{{ url }}" class="msg-attachment" alt="Imagen adjunta {{ forloop.counter }}">
-                      </a>
+                    {% if ext4 in ".png .jpg .gif .webp" or ext5 == ".jpeg" %}
+                    <a href="{{ url }}" target="_blank" class="me-2 mb-2">
+                      <img src="{{ url }}" class="msg-attachment" alt="Imagen adjunta {{ forloop.counter }}">
+                    </a>
                     {% elif ext4 == ".pdf" %}
                       <div class="me-2 mb-2 px-2 py-1 bg-secondary text-white small rounded">
                         <i class="fas fa-file-pdf"></i>
