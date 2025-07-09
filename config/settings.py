@@ -86,8 +86,17 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'tickets.sqlite3',
+        'ENGINE':   'django.db.backends.mysql',
+        'NAME':     os.environ.get('DB_NAME',     'soportebrio-database'),
+        'USER':     os.environ.get('DB_USER',     'jdwrnxssio'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', 'r2fIm7ciKbhU$PVu'),
+        'HOST':     os.environ.get('DB_HOST',     'soportebrio-server.mysql.database.azure.com'),
+        'PORT':     os.environ.get('DB_PORT',     '3306'),
+        'OPTIONS': {
+        
+            'ssl_mode': 'REQUIRED',
+       
+        },
     }
 }
 
