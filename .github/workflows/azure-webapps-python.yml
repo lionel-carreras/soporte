@@ -52,17 +52,12 @@ jobs:
           source .venv/bin/activate
           pip install -r requirements.txt
 
-      - name: Ejecutar migraciones de Django
-        run: |
-          source .venv/bin/activate
-          python manage.py migrate --noinput
-
       - name: Recoger archivos estáticos
         run: |
           source .venv/bin/activate
           python manage.py collectstatic --noinput
 
-      - name: Empaquetar aplicación para deploy
+      - name: Empaquetar para deploy
         run: |
           zip -r app.zip . \
             -x ".git/*" ".venv/*" "media/*"
@@ -76,4 +71,3 @@ jobs:
             -T app.zip \
             -H "Cache-Control: no-cache" \
             -H "Content-Type: application/zip"
-
