@@ -17,11 +17,11 @@
 # For more information on the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # For more samples to get started with GitHub Action workflows to deploy to Azure: https://github.com/Azure/actions-workflow-samples
 
-name: Deploy to Azure via ZIPDeploy
+name: CI → ZIPDeploy a Azure App Service
 
 on:
   push:
-    branches: [master]
+    branches: [ master ]
 
 jobs:
   deploy:
@@ -30,30 +30,48 @@ jobs:
       AZURE_WEBAPP_NAME: soportebrio
       AZURE_WEBAPP_PUBLISH_USER: ${{ secrets.AZURE_WEBAPP_PUBLISH_USER }}
       AZURE_WEBAPP_PUBLISH_PASS: ${{ secrets.AZURE_WEBAPP_PUBLISH_PASS }}
+      DJANGO_SETTINGS_MODULE: config.settings
+      PYTHONUNBUFFERED: 1
 
     steps:
-      - name: Checkout code
+      - name: Checkout del código
         run: |
-          git config --global advice.detachedHead false
           git init
           git remote add origin https://github.com/lionel-carreras/soporte.git
           git fetch --depth=1 origin master
           git checkout FETCH_HEAD
 
-      - name: Install zip (igual suele venir preinstalado)
-        run: sudo apt-get update && sudo apt-get install -y zip
-
-      - name: Create ZIP package
+      - name: Configurar Python y crear venv
         run: |
-          zip -r app.zip . -x ".git/*" "venv/*"
+          python3 -m venv .venv
+          source .venv/bin/activate
+          python -m pip install --upgrade pip
 
-      - name: Deploy via Kudu ZIPDeploy
+      - name: Instalar dependencias
         run: |
-          echo "Deploying to https://${AZURE_WEBAPP_NAME}.scm.azurewebsites.net/api/zipdeploy"
-          curl -sS -X POST \
+          source .venv/bin/activate
+          pip install -r requirements.txt
+
+      - name: Ejecutar migraciones
+        run: |
+          source .venv/bin/activate
+          python manage.py migrate --noinput
+
+      - name: Recoger archivos estáticos
+        run: |
+          source .venv/bin/activate
+          python manage.py collectstatic --noinput
+
+      - name: Empaquetar para deploy
+        run: |
+          zip -r app.zip . \
+            -x ".git/*" ".venv/*" "media/*"
+
+      - name: Desplegar a Azure (ZIPDeploy)
+        run: |
+          curl -sSL -X POST \
             -u "${AZURE_WEBAPP_PUBLISH_USER}:${AZURE_WEBAPP_PUBLISH_PASS}" \
             "https://${AZURE_WEBAPP_NAME}.scm.azurewebsites.net/api/zipdeploy?isAsync=true" \
             -T app.zip \
             -H "Cache-Control: no-cache" \
             -H "Content-Type: application/zip"
-
