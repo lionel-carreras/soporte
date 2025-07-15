@@ -324,7 +324,7 @@ def detail_ticket(request, ticket_id):
     ticket    = get_object_or_404(Ticket, pk=ticket_id)
     mensajes  = ticket.mensajes.order_by('-fecha_envio')
     is_agent  = request.user.groups.filter(name='agente').exists()
-    respuestas = Respuesta_pred.objects.all()    # <–– añadí esta línea
+    respuestas = Respuesta_pred.objects.all()    
 
     form = MessageForm()
     if request.method == 'POST':
@@ -349,7 +349,7 @@ def detail_ticket(request, ticket_id):
         'mensajes':  mensajes,
         'form':      form,
         'is_agent':  is_agent,
-        'respuestas': respuestas,   # <–– pásalas al template
+        'respuestas': respuestas,   
     })
 
     

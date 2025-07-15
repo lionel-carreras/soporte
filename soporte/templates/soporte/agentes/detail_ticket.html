@@ -5,13 +5,29 @@
   {{ block.super }}
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
   <style>
-    /* miniaturas en mensajes */
-    .msg-attachment {
-      max-height: 50px;
-      margin: .25rem;
-      border-radius: .25rem;
-      object-fit: cover;
-    }
+    /* Asegura que el <a> envuelva bien la imagen y esté por encima de overlays */
+.d-flex a {
+  display: inline-block;
+  position: relative;
+  z-index: 10;
+}
+/* en tu bloque <style> existente */
+ /* miniaturas clicables */
+  .msg-attachment {
+    pointer-events: auto !important;
+    cursor: pointer;
+    max-height: 50px;
+    margin: .25rem;
+    border-radius: .25rem;
+    object-fit: cover;
+    display: block;
+  }
+  /* el <a> que envuelve la imagen */
+  .msg-attachment-link {
+    display: inline-block;
+    position: relative;
+    z-index: 10;
+  }
     /* contenedor de textarea y dropzone */
     .msg-container {
       position: relative;
@@ -75,10 +91,10 @@
       </div>
     </div>
     <pre class="code">
-<span class="var">Título</span>= <span class="val">'{{ ticket.titulo|escapejs }}'</span>
+<span class="var">Título</span>= <span class="val">'{{ ticket.titulo}}'</span>
 <span class="var">Estado</span>= <span class="val">'{{ ticket.estado.nombre }}'</span>
 <span class="var">Usuario</span>= <span class="val">'{{ ticket.creado_por.username }}'</span>
-<span class="var">Sucursal</span>= <span class="val">'{{ ticket.creado_por.sucursal.nombre|escapejs }}'</span>
+<span class="var">Sucursal</span>= <span class="val">'{{ ticket.creado_por.sucursal.nombre }}'</span>
 <span class="var">Nombre</span>= <span class="val">'{{ ticket.creado_por.first_name }}'</span>
 <span class="var">Apellido</span>= <span class="val">'{{ ticket.creado_por.last_name }}'</span>
 <span class="var">Estado</span>= <span class="val">'{{ ticket.estado.nombre }}'</span>
@@ -86,22 +102,26 @@
 <span class="var">Creado</span>= <span class="val">'{{ ticket.fecha_creado|date:"Y-m-d H:i" }}'</span>
 <span class="var">Actualizado</span>= <span class="val">'{{ ticket.fecha_actualizado|date:"Y-m-d H:i" }}'</span>
 {% if ticket.motivo_anulacion %}
-<span class="var">Motivo anulación</span>= <span class="val">'{{ ticket.motivo_anulacion|escapejs }}'</span>
+<span class="var">Motivo anulación</span>= <span class="val">'{{ ticket.motivo_anulacion }}'</span>
 {% endif %}
 {% if ticket.estado.nombre == 'Reabierto' %}
-<span class="var">Motivo reapertura</span>= <span class="val">'{{ ticket.motivo_reapertura|escapejs }}'</span>
+<span class="var">Motivo reapertura</span>= <span class="val">'{{ ticket.motivo_reapertura }}'</span>
 {% endif %}
-<span class="var">Descripción</span>= <span class="val">'{{ ticket.descripcion|default:"— sin descripción —"|escapejs }}'</span>
+<span class="var">Descripción</span>= <span class="val">'{{ ticket.descripcion|default:"— sin descripción —" }}'</span>
     </pre>
 
             <!-- Miniatura si existe -->
-    {% if ticket.imagenes.exists %}
-      <div class="px-2 pt-2">
-        <img src="{{ ticket.imagenes.all.0.imagen.url }}"
-          class="img-fluid rounded"        
-          style="max-height:80px; object-fit:cover;">
-      </div>
-    {% endif %}  
+   {% if ticket.imagenes.exists %}
+  <div class="px-2 pt-2">
+    <a href="{{ ticket.imagenes.all.0.imagen.url }}"
+       target="_blank"
+       rel="noopener noreferrer">
+      <img src="{{ ticket.imagenes.all.0.imagen.url }}"
+           class="img-fluid rounded"
+           style="max-height:80px; object-fit:cover;">
+    </a>
+  </div>
+{% endif %}
   </div>
 
 
@@ -127,31 +147,25 @@
 
             <pre class="code">
 <span class="var">Fecha</span>= <span class="val">'{{ m.fecha_envio|date:"Y-m-d H:i" }}'</span>
-<span class="var">Mensaje</span>= <span class="val">'{{ m.contenido|escapejs }}'</span>
+<span class="var">Mensaje</span>= <span class="val">'{{ m.contenido }}'</span>
             </pre>
             {% if m.attachments.count %}
               <div class="d-flex flex-wrap">
                 {% for att in m.attachments.all %}
                   {% with url=att.file.url %}
                   {% with ext4=url|lower|slice:"-4:" ext5=url|lower|slice:"-5:" %}
-                    {% if ext4 in ".png .jpg .gif .webp" or ext5 == ".jpeg" %}
-                    <a href="{{ url }}" target="_blank" class="me-2 mb-2">
-                      <img src="{{ url }}" class="msg-attachment" alt="Imagen adjunta {{ forloop.counter }}">
+                    {% if ext4 in ".png .jpg .gif .heic .webp" or ext5 == ".jpeg" %}
+                    <a href="{{ url }}" target="_blank" rel="noopener noreferrer"  class="msg-attachment-link me-2 mb-2">
+                      <img src="{{ url }}" class="msg-attachment" rel="noopener noreferrer" alt="Imagen adjunta {{ forloop.counter }}">
                     </a>
                     {% elif ext4 == ".pdf" %}
                       <div class="me-2 mb-2 px-2 py-1 bg-secondary text-white small rounded">
                         <i class="fas fa-file-pdf"></i>
-                        <a href="{{ url }}" target="_blank" class="text-white">
+                        <a href="{{ url }}" target="_blank" rel="noopener noreferrer"  class="text-white">
                           {{ att.file.name|slice:"-20:" }}
                         </a>
                       </div>
-                      {% elif ext4 == ".webp" %}
-                      <div class="me-2 mb-2 px-2 py-1 bg-secondary text-white small rounded">
-                        <i class="fas fa-file-webp"></i>
-                        <a href="{{ url }}" target="_blank" class="text-white">
-                          {{ att.file.name|slice:"-20:" }}
-                        </a>
-                      </div>
+                      
                     {% elif ext5 in ".docx" or ext4 == ".doc" %}
                       <div class="me-2 mb-2 px-2 py-1 bg-secondary text-white small rounded">
                         <i class="fas fa-file-word"></i>
@@ -215,7 +229,7 @@
             aria-label="Respuestas predeterminadas">
       <option value="">– Seleccionar respuesta rápida –</option>
       {% for r in respuestas %}
-        <option value="{{ r.respuesta|escapejs }}">{{ r.respuesta }}</option>
+        <option value="{{ r.respuesta }}">{{ r.respuesta }}</option>
       {% endfor %}
     </select>
     {% endif %}

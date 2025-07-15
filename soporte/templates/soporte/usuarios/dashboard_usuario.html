@@ -4,6 +4,21 @@
 {% block extra_css %}
 {{ block.super }}
 <link rel="stylesheet" href="{% static 'css/style.css' %}">
+<style>
+.thumbnail-link {
+  display: inline-block;
+  position: relative;
+  z-index: 1;
+}
+.ticket-thumbnail {
+  max-height: 80px;
+  object-fit: cover;
+  cursor: pointer;
+  pointer-events: auto;
+}
+  
+
+</style>
 {% endblock %}
 
 {% block title %}Dashboard Usuario{% endblock %}
@@ -38,28 +53,33 @@
             </div>
             <div class="code-container">
               <pre class="code">
-<span class="var">Título</span>= <span class="val">'{{ ticket.titulo|escapejs }}'</span>
+<span class="var">Título</span>= <span class="val">'{{ ticket.titulo }}'</span>
 <span class="var">Usuario</span>= <span class="val">'{{ ticket.creado_por.username }}'</span>
-<span class="var">Sucursal</span>= <span class="val">'{{ ticket.creado_por.sucursal.nombre|escapejs }}'</span>
+<span class="var">Sucursal</span>= <span class="val">'{{ ticket.creado_por.sucursal.nombre }}'</span>
 <span class="var">Nombre</span>= <span class="val">'{{ ticket.creado_por.first_name }}'</span>
 <span class="var">Apellido</span>= <span class="val">'{{ ticket.creado_por.last_name }}'</span>
 <span class="var">Fecha</span>= <span class="val">'{{ ticket.fecha_creado|date:"Y-m-d" }}'</span>
 <span class="var">Estado</span>= <span class="val">'{{ ticket.estado.nombre }}'</span>
 {% if ticket.estado.nombre == 'Reabierto' %}
 <span class="var">Reabierto por</span>= <span class="val">'{{ ticket.asignado_a.username }}'</span>
-<span class="var">Motivo</span>= <span class="val">'{{ ticket.motivo_reapertura|escapejs }}'</span>
+<span class="var">Motivo</span>= <span class="val">'{{ ticket.motivo_reapertura }}'</span>
 {% endif %}
-<span class="var">Descripción</span>= <span class="val">'{{ ticket.descripcion|escapejs }}'</span>
+<span class="var">Descripción</span>= <span class="val">'{{ ticket.descripcion }}'</span>
           </pre>
 
            <!-- Miniatura si existe -->
     {% if ticket.imagenes.exists %}
-      <div class="px-2 pt-2">
-        <img src="{{ ticket.imagenes.all.0.imagen.url }}"
-          class="img-fluid rounded"        
-          style="max-height:80px; object-fit:cover;">
-      </div>
-    {% endif %}
+  <div class="px-2 pt-2">
+    <a href="{{ ticket.imagenes.all.0.imagen.url }}"
+       target="_blank"
+       class="thumbnail-link me-2 mb-2">
+      <img src="{{ ticket.imagenes.all.0.imagen.url }}"
+           class="ticket-thumbnail img-fluid rounded"
+           alt="Miniatura ticket {{ ticket.id }}">
+    </a>
+  </div>
+{% endif %}
+
 
             </div>
             <div class="footer">
@@ -96,25 +116,29 @@
             </div>
             <div class="code-container">
               <pre class="code">
-<span class="var">Título</span>= <span class="val">'{{ ticket.titulo|escapejs }}'</span>
+<span class="var">Título</span>= <span class="val">'{{ ticket.titulo }}'</span>
 <span class="var">Usuario</span>= <span class="val">'{{ ticket.creado_por.username }}'</span>
-<span class="var">Sucursal</span>= <span class="val">'{{ ticket.creado_por.sucursal.nombre|escapejs }}'</span>
+<span class="var">Sucursal</span>= <span class="val">'{{ ticket.creado_por.sucursal.nombre }}'</span>
 <span class="var">Nombre</span>= <span class="val">'{{ ticket.creado_por.first_name }}'</span>
 <span class="var">Apellido</span>= <span class="val">'{{ ticket.creado_por.last_name }}'</span>
 <span class="var">Fecha</span>= <span class="val">'{{ ticket.fecha_creado|date:"Y-m-d" }}'</span>
 <span class="var">Estado</span>= <span class="val">'{{ ticket.estado.nombre }}'</span>
 <span class="var">Agente asignado</span>= <span class="val">'{{ ticket.asignado_a.first_name }}'</span><br>
-<span class="var">Descripción</span>= <span class="val">'{{ ticket.descripcion|escapejs }}'</span>
+<span class="var">Descripción</span>= <span class="val">'{{ ticket.descripcion }}'</span>
               </pre>
 
                <!-- Miniatura si existe -->
     {% if ticket.imagenes.exists %}
-      <div class="px-2 pt-2">
-        <img src="{{ ticket.imagenes.all.0.imagen.url }}"
-          class="img-fluid rounded"        
-          style="max-height:80px; object-fit:cover;">
-      </div>
-    {% endif %}
+  <div class="px-2 pt-2">
+    <a href="{{ ticket.imagenes.all.0.imagen.url }}"
+       target="_blank"
+       class="thumbnail-link me-2 mb-2">
+      <img src="{{ ticket.imagenes.all.0.imagen.url }}"
+           class="ticket-thumbnail img-fluid rounded"
+           alt="Miniatura ticket {{ ticket.id }}">
+    </a>
+  </div>
+{% endif %}
 
             </div>
             <div class="footer">
@@ -151,20 +175,24 @@
             </div>
             <div class="code-container">
               <pre class="code">
-<span class="var">Título</span>= <span class="val">'{{ ticket.titulo|escapejs }}'</span>
+<span class="var">Título</span>= <span class="val">'{{ ticket.titulo}}'</span>
 <span class="var">Estado</span>= <span class="val">'Resuelto'</span>
 <span class="var">Actualizado</span>= <span class="val">'{{ ticket.fecha_actualizado|date:"Y-m-d H:i" }}'</span>
-<span class="var">Descripción</span>= <span class="val">'{{ ticket.descripcion|escapejs }}'</span>
+<span class="var">Descripción</span>= <span class="val">'{{ ticket.descripcion}}'</span>
               </pre>
 
                <!-- Miniatura si existe -->
     {% if ticket.imagenes.exists %}
-      <div class="px-2 pt-2">
-        <img src="{{ ticket.imagenes.all.0.imagen.url }}"
-          class="img-fluid rounded"        
-          style="max-height:80px; object-fit:cover;">
-      </div>
-    {% endif %}
+  <div class="px-2 pt-2">
+    <a href="{{ ticket.imagenes.all.0.imagen.url }}"
+       target="_blank"
+       class="thumbnail-link me-2 mb-2">
+      <img src="{{ ticket.imagenes.all.0.imagen.url }}"
+           class="ticket-thumbnail img-fluid rounded"
+           alt="Miniatura ticket {{ ticket.id }}">
+    </a>
+  </div>
+{% endif %}
 
     
             </div>

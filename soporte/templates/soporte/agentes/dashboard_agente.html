@@ -4,6 +4,22 @@
 {% block extra_css %}
 {{ block.super }}
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+  <style>
+.thumbnail-link {
+  display: inline-block;
+  position: relative;
+  z-index: 1;
+}
+.ticket-thumbnail {
+  max-height: 80px;
+  object-fit: cover;
+  cursor: pointer;
+  pointer-events: auto;
+}
+  
+
+</style>
 {% endblock %}
 
 {% block title %}Dashboard Agente{% endblock %}
@@ -53,12 +69,16 @@
           </pre>
           <!-- Miniatura si existe -->
     {% if ticket.imagenes.exists %}
-      <div class="px-2 pt-2">
-        <img src="{{ ticket.imagenes.all.0.imagen.url }}"
-          class="img-fluid rounded"        
-          style="max-height:80px; object-fit:cover;">
-      </div>
-    {% endif %}
+  <div class="px-2 pt-2">
+    <a href="{{ ticket.imagenes.all.0.imagen.url }}"
+       target="_blank"
+       class="thumbnail-link me-2 mb-2">
+      <img src="{{ ticket.imagenes.all.0.imagen.url }}"
+           class="ticket-thumbnail img-fluid rounded"
+           alt="Miniatura ticket {{ ticket.id }}">
+    </a>
+  </div>
+{% endif %}
 
         </div>
         <!-- pie -->
@@ -127,13 +147,16 @@
 
                <!-- Miniatura si existe -->
     {% if ticket.imagenes.exists %}
-      <div class="px-2 pt-2">
-        <img src="{{ ticket.imagenes.all.0.imagen.url }}"
-          class="img-fluid rounded"        
-          style="max-height:80px; object-fit:cover;">
-      </div>
-    {% endif %}
-
+  <div class="px-2 pt-2">
+    <a href="{{ ticket.imagenes.all.0.imagen.url }}"
+       target="_blank"
+       class="thumbnail-link me-2 mb-2">
+      <img src="{{ ticket.imagenes.all.0.imagen.url }}"
+           class="ticket-thumbnail img-fluid rounded"
+           alt="Miniatura ticket {{ ticket.id }}">
+    </a>
+  </div>
+{% endif %}
             </div>
             <div class="footer d-flex justify-content-between mt-2">
               <div class="d-flex gap-2">
@@ -200,12 +223,16 @@
 
                <!-- Miniatura si existe -->
     {% if ticket.imagenes.exists %}
-      <div class="px-2 pt-2">
-        <img src="{{ ticket.imagenes.all.0.imagen.url }}"
-          class="img-fluid rounded"        
-          style="max-height:80px; object-fit:cover;">
-      </div>
-    {% endif %}
+  <div class="px-2 pt-2">
+    <a href="{{ ticket.imagenes.all.0.imagen.url }}"
+       target="_blank"
+       class="thumbnail-link me-2 mb-2">
+      <img src="{{ ticket.imagenes.all.0.imagen.url }}"
+           class="ticket-thumbnail img-fluid rounded"
+           alt="Miniatura ticket {{ ticket.id }}">
+    </a>
+  </div>
+{% endif %}
 
     
             </div>
