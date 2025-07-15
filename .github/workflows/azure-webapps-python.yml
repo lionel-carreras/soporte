@@ -41,7 +41,7 @@ jobs:
           git fetch --depth=1 origin master
           git checkout FETCH_HEAD
 
-      - name: Configurar Python y crear venv
+      - name: Instalar Python y crear virtualenv
         run: |
           python3 -m venv .venv
           source .venv/bin/activate
@@ -52,7 +52,7 @@ jobs:
           source .venv/bin/activate
           pip install -r requirements.txt
 
-      - name: Ejecutar migraciones
+      - name: Ejecutar migraciones de Django
         run: |
           source .venv/bin/activate
           python manage.py migrate --noinput
@@ -62,16 +62,18 @@ jobs:
           source .venv/bin/activate
           python manage.py collectstatic --noinput
 
-      - name: Empaquetar para deploy
+      - name: Empaquetar aplicación para deploy
         run: |
           zip -r app.zip . \
             -x ".git/*" ".venv/*" "media/*"
 
       - name: Desplegar a Azure (ZIPDeploy)
         run: |
-          curl -sSL -X POST \
+          echo "📦 ZIPDeploy a https://${AZURE_WEBAPP_NAME}.scm.azurewebsites.net/api/zipdeploy"
+          curl -sS -X POST \
             -u "${AZURE_WEBAPP_PUBLISH_USER}:${AZURE_WEBAPP_PUBLISH_PASS}" \
             "https://${AZURE_WEBAPP_NAME}.scm.azurewebsites.net/api/zipdeploy?isAsync=true" \
             -T app.zip \
             -H "Cache-Control: no-cache" \
             -H "Content-Type: application/zip"
+
