@@ -54,8 +54,7 @@
       <div class="col-md-3" id="ipWrapper">
         <label class="form-label">IP / PC</label>
         <input name="ip" id="ipField" class="form-control" placeholder="Ej: 192.168.1.50 / PC-025"
-               value="{{ imp.ip|default_if_none:'' }}"
-               inputmode="numeric" pattern="^(\d{1,3}\.){3}\d{1,3}$">
+               value="{{ imp.ip|default_if_none:'' }}">
 
       </div>
 
