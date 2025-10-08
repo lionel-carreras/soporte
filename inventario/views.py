@@ -154,10 +154,6 @@ def impresora_edit(request, pk):
         imp.ubicacion = (data.get("ubicacion") or "").strip()
         imp.notas     = (data.get("notas") or "").strip()
 
-        if imp.conexion == "IP" and not imp.ip:
-            messages.error(request, "La IP es obligatoria cuando la conexión es IP.")
-            return render(request, "soporte/inventario/impresora_edit.html", {"sucursales": sucursales, "imp": imp, "mode": "edit"})
-
         try:
             imp.full_clean()
             imp.save()
