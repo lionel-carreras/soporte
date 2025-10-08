@@ -26,9 +26,10 @@ SECRET_KEY = 'django-insecure-a&1jb%*vxiv@mh4l@o8n-289_01mlgak7re*q4h_827ukcn0o!
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    os.environ.get("WEBSITE_HOSTNAME", ""), 
+    os.environ.get("WEBSITE_HOSTNAME", ""),
     "localhost",
     "127.0.0.1",
+    "192.168.0.140",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
@@ -48,6 +49,7 @@ INSTALLED_APPS = [
     'users',
     'soporte',
     'messenger',
+    'inventario',
 ]
 
 MIDDLEWARE = [
@@ -84,21 +86,34 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE':   'django.db.backends.mysql',
-        'NAME':     os.environ.get('DB_NAME',     'soportebrio-database'),
-        'USER':     os.environ.get('DB_USER',     'jdwrnxssio'),
-        'PASSWORD': os.environ.get('DB_PASSWORD', 'r2fIm7ciKbhU$PVu'),
-        'HOST':     os.environ.get('DB_HOST',     'soportebrio-server.mysql.database.azure.com'),
-        'PORT':     os.environ.get('DB_PORT',     '3306'),
-        'OPTIONS': {
-        
-            'ssl_mode': 'REQUIRED',
-       
-        },
+
+
+
+
+DB_VENDOR = os.getenv("DJANGO_DB", "sqlite").lower()  # 'sqlite' por defecto
+
+if DB_VENDOR == "sqlite":
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
     }
-}
+else:  # mysql (Azure)
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.mysql",
+            "NAME": os.getenv("DB_NAME", "soportebrio-database"),
+            "USER": os.getenv("DB_USER", "jdwrnxssio"),
+            "PASSWORD": os.getenv("DB_PASSWORD", "r2fIm7ciKbhU$PVu"),
+            "HOST": os.getenv("DB_HOST", "soportebrio-server.mysql.database.azure.com"),
+            "PORT": os.getenv("DB_PORT", "3306"),
+            "OPTIONS": {
+                "ssl_mode": os.getenv("MYSQL_SSL_MODE", "REQUIRED"),
+                # si usás PyMySQL: "init_command": "SET sql_mode='STRICT_TRANS_TABLES'"
+            },
+        }
+    }
 
 
 # Password validation

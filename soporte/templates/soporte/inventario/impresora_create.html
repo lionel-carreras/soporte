@@ -1,0 +1,93 @@
+
+{% extends 'soporte/app.html' %}
+{% load static %}
+
+{% block title %}Nueva impresora{% endblock %}
+
+{% block content %}
+<h4 class="mb-3">Nueva impresora</h4>
+
+{% if messages %}
+  {% for m in messages %}
+    <div class="alert alert-{{ m.tags }} py-2">{{ m }}</div>
+  {% endfor %}
+{% endif %}
+
+<form method="post" action="{% url 'inventario:impresora_create' %}" class="card">
+  {% csrf_token %}
+  <div class="card-body">
+    <div class="row g-3">
+
+      <div class="col-md-4">
+        <label class="form-label">Marca</label>
+        <input name="marca" class="form-control" required>
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label">Modelo</label>
+        <input name="modelo" class="form-control" required>
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label">N° de serie</label>
+        <input name="nro_serie" class="form-control" required>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Sucursal</label>
+        <select class="form-select" name="sucursal" required>
+            <option value="">— Sucursal —</option>
+            {% for s in sucursales %}
+            <option value="{{ s.id }}">{{ s.nombre }}</option>
+            {% endfor %}
+        </select>
+     </div>
+
+      <div class="col-md-3">
+        <label class="form-label">Conexión</label>
+        <select name="conexion" id="conexion" class="form-select" required>
+          <option value="">— Elegir —</option>
+          <option value="IP">IP</option>
+          <option value="USB">USB</option>
+        </select>
+      </div>
+
+      <div class="col-md-3" id="ipWrapper">
+        <label class="form-label">IP / PC</label>
+        <input name="ip" id="ipField" class="form-control" placeholder="Ej: 192.168.1.50 / PC-025">
+      </div>
+
+      <div class="col-md-3">
+        <label class="form-label">Propiedad</label>
+        <select name="propiedad" class="form-select" required>
+          <option value="">— Elegir —</option>
+          <option value="PROPIA">Propia</option>
+          <option value="ALQUILER">Alquiler</option>
+        </select>
+      </div>
+
+      <div class="col-md-3 d-flex align-items-center">
+        <div class="form-check mt-4">
+          <input class="form-check-input" type="checkbox" id="activa" name="activa" checked>
+          <label class="form-check-label" for="activa">Activa</label>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Sector (opcional)</label>
+        <input name="ubicacion" class="form-control">
+      </div>
+
+
+    </div>
+  </div>
+  <div class="card-footer d-flex gap-2">
+    <button class="btn btn-primary">Crear</button>
+    <a href="{% url 'inventario:impresora_list' %}" class="btn btn-outline-secondary">Cancelar</a>
+  </div>
+</form>
+{% endblock %}
+
+
+
+

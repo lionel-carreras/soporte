@@ -1,0 +1,29 @@
+{% extends 'soporte/app.html' %}
+
+{% block title %}Eliminar impresora{% endblock %}
+
+{% block content %}
+<h4 class="mb-3">Eliminar impresora</h4>
+
+<div class="alert alert-warning d-flex align-items-start" role="alert">
+  <i class="fa fa-triangle-exclamation me-2 mt-1"></i>
+  <div>
+    <strong>¿Confirmás eliminar esta impresora?</strong><br>
+    Esta acción no se puede deshacer.
+    <div class="mt-2 small text-muted">
+      <div><b>Sucursal:</b> {{ imp.sucursal.nombre }}</div>
+      <div><b>Equipo:</b> {{ imp.marca }} {{ imp.modelo }}</div>
+      <div><b>N° de serie:</b> {{ imp.nro_serie }}</div>
+      <div><b>Conexión:</b> {{ imp.conexion }}{% if imp.ip %} • {{ imp.ip }}{% endif %}</div>
+    </div>
+  </div>
+</div>
+
+<form method="post" action="{% url 'inventario:impresora_delete' imp.id %}" class="d-flex gap-2">
+  {% csrf_token %}
+  <button class="btn btn-danger">
+    <i class="fa fa-trash me-1"></i> Eliminar definitivamente
+  </button>
+  <a href="{% url 'inventario:impresora_list' %}" class="btn btn-outline-secondary">Cancelar</a>
+</form>
+{% endblock %}
