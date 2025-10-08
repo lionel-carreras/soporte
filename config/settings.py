@@ -168,5 +168,5 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 # Azure Web PubSub connection string
 AZURE_WEBPUBSUB_ENDPOINT   = "https://noti-ticket.webpubsub.azure.com"
-AZURE_WEBPUBSUB_ACCESS_KEY = "***REMOVED***"
+AZURE_WEBPUBSUB_ACCESS_KEY = "3FnAl5ZGkyrCIhX7ARa5geTpTVJh7azmKnndSO0XLkphZe9cnlHlJQQJ99BFACYeBjFXJ3w3AAAAAWPSRVq3"
 AZURE_WEBPUBSUB_HUB        = "alerts"
