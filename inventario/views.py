@@ -147,8 +147,7 @@ def impresora_edit(request, pk):
         imp.nro_serie = (data.get("nro_serie") or "").strip()
         imp.sucursal_id = data.get("sucursal") or None
         imp.conexion  = data.get("conexion") or ""
-        ip            = (data.get("ip") or "").strip()
-        imp.ip        = ip or None
+        ip          = data.get("ip") or ""
         imp.propiedad = data.get("propiedad") or ""
         imp.activa    = _bool(data.get("activa"))
         imp.ubicacion = (data.get("ubicacion") or "").strip()
