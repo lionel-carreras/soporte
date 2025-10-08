@@ -65,7 +65,7 @@
 <span class="var">Reabierto por</span>= <span class="val">'{{ ticket.asignado_a.username }}'</span>
 <span class="var">Motivo</span>= <span class="val">'{{ ticket.motivo_reapertura|escapejs }}'</span>
 {% endif %}
-<span class="var">Descripción</span>= <span class="val">'{{ ticket.descripcion|escapejs }}'</span>
+<span class="var">Descripción</span>= <span class="val">'{{ ticket.descripcion }}'</span>
           </pre>
           <!-- Miniatura si existe -->
     {% if ticket.imagenes.exists %}
@@ -142,7 +142,7 @@
 <span class="var">Fecha</span>= <span class="val">'{{ ticket.fecha_creado|date:"Y-m-d" }}'</span>
 <span class="var">Estado</span>= <span class="val">'{{ ticket.estado.nombre }}'</span>
 <span class="var">Agente asignado</span>= <span class="val">'{{ ticket.asignado_a.first_name }}'</span><br>
-<span class="var">Descripción</span>= <span class="val">'{{ ticket.descripcion|escapejs }}'</span>
+<span class="var">Descripción</span>= <span class="val">'{{ ticket.descripcion }}'</span>
               </pre>
 
                <!-- Miniatura si existe -->
@@ -218,7 +218,7 @@
 <span class="var">Fecha</span>= <span class="val">'{{ ticket.fecha_creado|date:"Y-m-d" }}'</span>
 <span class="var">Estado</span>= <span class="val">'{{ ticket.estado.nombre }}'</span>
 <span class="var">Resuelto por</span>= <span class="val">'{{ ticket.asignado_a.first_name }}'</span><br>
-<span class="var">Descripción</span>= <span class="val">'{{ ticket.descripcion|escapejs }}'</span>
+<span class="var">Descripción</span>= <span class="val">'{{ ticket.descripcion }}'</span>
               </pre>
 
                <!-- Miniatura si existe -->
