@@ -90,30 +90,21 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 
 
-DB_VENDOR = os.getenv("DJANGO_DB", "sqlite").lower()  # 'sqlite' por defecto
+DATABASES = {
+    'default': {
+        'ENGINE':   'django.db.backends.mysql',
+        'NAME':     os.environ.get('DB_NAME',     'soportebrio-database'),
+        'USER':     os.environ.get('DB_USER',     'jdwrnxssio'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', 'r2fIm7ciKbhU$PVu'),
+        'HOST':     os.environ.get('DB_HOST',     'soportebrio-server.mysql.database.azure.com'),
+        'PORT':     os.environ.get('DB_PORT',     '3306'),
+        'OPTIONS': {
 
-if DB_VENDOR == "sqlite":
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
+            'ssl_mode': 'REQUIRED',
+
+        },
     }
-else:  # mysql (Azure)
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.mysql",
-            "NAME": os.getenv("DB_NAME", "soportebrio-database"),
-            "USER": os.getenv("DB_USER", "jdwrnxssio"),
-            "PASSWORD": os.getenv("DB_PASSWORD", "r2fIm7ciKbhU$PVu"),
-            "HOST": os.getenv("DB_HOST", "soportebrio-server.mysql.database.azure.com"),
-            "PORT": os.getenv("DB_PORT", "3306"),
-            "OPTIONS": {
-                "ssl_mode": os.getenv("MYSQL_SSL_MODE", "REQUIRED"),
-                # si usás PyMySQL: "init_command": "SET sql_mode='STRICT_TRANS_TABLES'"
-            },
-        }
-    }
+}
 
 
 # Password validation
