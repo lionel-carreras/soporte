@@ -56,6 +56,8 @@ def impresora_list(request):
     activa     = request.GET.get("activa")   or ""
     conexion   = request.GET.get("conexion") or ""
     propiedad  = request.GET.get("propiedad") or ""
+    ubicacion  = request.GET.get("ubicacion") or ""
+    toner      = request.GET.get("toner") or ""
 
     qs = (Impresora.objects
             .select_related("sucursal")
@@ -87,7 +89,7 @@ def impresora_list(request):
         "sucursales": Sucursal.objects.order_by("nombre"),
         "f": {  # preservar selección en el template
             "q": q, "sucursal": suc_id, "activa": activa,
-            "conexion": conexion, "propiedad": propiedad
+            "conexion": conexion, "propiedad": propiedad, "ubicacion": ubicacion, "toner": toner,
         },
         "choices": {
             "conexion": Impresora.CONEXION_CHOICES,

@@ -66,6 +66,8 @@
         <th>IP / PC</th>
         <th>Propiedad</th>
         <th>Activa</th>
+        <th>Sector</th>
+        <th>Toner </th>
         <th class="text-end">Acciones</th>
       </tr>
     </thead>
@@ -92,6 +94,8 @@
             <i class="fa fa-xmark text-danger"></i>
           {% endif %}
         </td>
+        <td>{{ imp.ubicacion|default:"—" }}</td>
+        <td>{{ imp.toner|default:"—" }}</td>
         <td class="text-end">
           <a class="btn btn-outline-primary btn-sm" href="{% url 'inventario:impresora_edit' imp.id %}"><i class="fa fa-pen"></i></a>
           <a class="btn btn-outline-secondary btn-sm" href="{% url 'inventario:impresora_detail' imp.id %}"><i class="fa fa-eye"></i></a>

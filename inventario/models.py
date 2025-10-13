@@ -24,6 +24,8 @@ class Impresora(models.Model):
     ubicacion  = models.CharField(max_length=120, blank=True, default="", help_text="Ej: Administración, Depósito")
     notas      = models.TextField(blank=True, default="")
 
+    toner      = models.CharField(max_length=120, blank=True, default="", help_text="Modelo de tóner/cartucho")
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
