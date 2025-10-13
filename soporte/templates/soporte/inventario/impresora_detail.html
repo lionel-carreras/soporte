@@ -19,6 +19,7 @@
         <div class="mb-2"><strong>Conexión:</strong> {{ imp.conexion }}</div>
         <div class="mb-2"><strong>IP / PC:</strong> {{ imp.ip|default:"—" }}</div>
         <div class="mb-2"><strong>Propiedad:</strong> {{ imp.get_propiedad_display }}</div>
+        <div class="mb-2"><strong>Toner:</strong> {{ imp.toner|default:"—" }}</div>
         <div class="mb-3"><strong>Activa:</strong>
           {% if imp.activa %}<span class="badge text-bg-success">Sí</span>{% else %}<span class="badge text-bg-secondary">No</span>{% endif %}
         </div><br>

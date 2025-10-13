@@ -113,6 +113,8 @@ def impresora_create(request):
         activa      = bool(data.get("activa"))
         ubicacion   = (data.get("ubicacion") or "").strip()
         notas       = (data.get("notas") or "").strip()
+        toner       = data.get("toner") or ""
+
 
         # validación mínima
         if not (marca and modelo and nro_serie and sucursal_id and conexion and propiedad):
@@ -122,9 +124,10 @@ def impresora_create(request):
         try:
             imp = Impresora(
                 marca=marca, modelo=modelo, nro_serie=nro_serie,
-                sucursal_id=sucursal_id,                    # <-- usar *_id
+                sucursal_id=sucursal_id,
                 conexion=conexion, ip=ip, propiedad=propiedad,
                 activa=activa, ubicacion=ubicacion, notas=notas,
+                toner=toner,
             )
             imp.save()
         except Exception as e:
@@ -154,6 +157,7 @@ def impresora_edit(request, pk):
         imp.activa    = _bool(data.get("activa"))
         imp.ubicacion = (data.get("ubicacion") or "").strip()
         imp.notas     = (data.get("notas") or "").strip()
+        imp.toner     = data.get("toner") or ""
 
         try:
             imp.full_clean()
@@ -168,7 +172,7 @@ def impresora_edit(request, pk):
         messages.success(request, "Impresora actualizada.")
         return redirect("inventario:impresora_list")
 
-    return render(request, "soporte/inventario/impresora_edit.html", {"sucursales": sucursales, "imp": imp, "mode": "edit"})
+    return render(request, "soporte/inventario/impresora_edit.html", {"sucursales": sucursales, "imp": imp, "mode": "edit","imp.toner": imp.toner})
 
 @login_required
 @permission_required("inventario.delete_impresora", raise_exception=True)
