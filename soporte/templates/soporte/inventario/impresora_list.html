@@ -138,20 +138,20 @@
       <li class="page-item disabled"><span class="page-link">‹</span></li>
     {% endif %}
 
-    {# ventana de páginas con elipsis #}
     {% for i in page_obj.paginator.page_range %}
-      {% if i == 1 or i == page_obj.paginator.num_pages or (i >= page_obj.number|add:-2 and i <= page_obj.number|add:2) %}
-        {% if i == page_obj.number %}
-          <li class="page-item active"><span class="page-link">{{ i }}</span></li>
-        {% else %}
-          <li class="page-item"><a class="page-link" href="?page={{ i }}{% if qstring %}&{{ qstring }}{% endif %}">{{ i }}</a></li>
-        {% endif %}
-      {% elif i == 2 and page_obj.number > 4 %}
-        <li class="page-item disabled"><span class="page-link">…</span></li>
-      {% elif i == page_obj.paginator.num_pages|add:-1 and page_obj.number < page_obj.paginator.num_pages|add:-3 %}
-        <li class="page-item disabled"><span class="page-link">…</span></li>
-      {% endif %}
-    {% endfor %}
+  {% if i == 1 or i == page_obj.paginator.num_pages or i >= page_obj.number|add:"-2" and i <= page_obj.number|add:"2" %}
+    {% if i == page_obj.number %}
+      <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+    {% else %}
+      <li class="page-item"><a class="page-link" href="?page={{ i }}{% if qstring %}&{{ qstring }}{% endif %}">{{ i }}</a></li>
+    {% endif %}
+  {% elif i == 2 and page_obj.number > 4 %}
+    <li class="page-item disabled"><span class="page-link">…</span></li>
+  {% elif i == page_obj.paginator.num_pages|add:"-1" and page_obj.number < page_obj.paginator.num_pages|add:"-3" %}
+    <li class="page-item disabled"><span class="page-link">…</span></li>
+  {% endif %}
+{% endfor %}
+
 
     {# › y » #}
     {% if page_obj.has_next %}
