@@ -82,7 +82,7 @@ def impresora_list(request):
     if propiedad in ("PROPIA", "ALQUILER"):
         qs = qs.filter(propiedad=propiedad)
 
-    page_obj = Paginator(qs, 20).get_page(request.GET.get("page"))
+    page_obj = Paginator(qs, 15).get_page(request.GET.get("page"))
 
     return render(request, "soporte/inventario/impresora_list.html", {
         "page_obj": page_obj,
