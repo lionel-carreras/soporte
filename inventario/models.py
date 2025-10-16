@@ -8,6 +8,7 @@ class Impresora(models.Model):
     PROPIEDAD_CHOICES = [
         ("PROPIA", "Propia"),
         ("ALQUILER", "Alquiler"),
+        ("REPARACION", "En Reparación"),
     ]
 
     marca      = models.CharField(max_length=80)
