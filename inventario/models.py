@@ -18,7 +18,7 @@ class Impresora(models.Model):
     sucursal   = models.ForeignKey('soporte.Sucursal', on_delete=models.PROTECT, related_name="impresoras")
     conexion   = models.CharField(max_length=3, choices=CONEXION_CHOICES)
     ip = models.CharField("IP / PC", max_length=120, blank=True, default="")
-    propiedad  = models.CharField(max_length=8, choices=PROPIEDAD_CHOICES)
+    propiedad  = models.CharField(max_length=30, choices=PROPIEDAD_CHOICES)
     activa     = models.BooleanField(default=True)
 
     # opcionales
