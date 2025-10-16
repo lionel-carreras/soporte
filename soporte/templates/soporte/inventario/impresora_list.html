@@ -83,6 +83,8 @@
         <td>
           {% if imp.propiedad == "PROPIA" %}
             <span class="badge text-bg-success">Propia</span>
+          {% elif imp.propiedad == "REPARACION" %}
+            <span class="badge text-bg-secondary">En Reparación</span>
           {% else %}
             <span class="badge text-bg-warning">Alquiler</span>
           {% endif %}
