@@ -14,8 +14,8 @@ from django.utils.text import slugify
 from io import BytesIO
 import qrcode
 
-def _bool(v):  # checkbox helper
-    return bool(v) and v not in ("0", "false", "False")
+def _to_bool(v):
+    return str(v).lower() in {"1","true","on","yes","y","t","si","sí"}
 
 
 # detail pública (sin login)
@@ -139,40 +139,66 @@ def impresora_create(request):
 
     return render(request, "soporte/inventario/impresora_create.html", {"sucursales": sucursales})
 
+
+
 @login_required
 @permission_required("inventario.change_impresora", raise_exception=True)
 def impresora_edit(request, pk):
     imp = get_object_or_404(Impresora, pk=pk)
     sucursales = Sucursal.objects.order_by("nombre")
+    choices_propiedad = Impresora._meta.get_field("propiedad").choices
 
     if request.method == "POST":
         data = request.POST
-        imp.marca     = (data.get("marca") or "").strip()
-        imp.modelo    = (data.get("modelo") or "").strip()
-        imp.nro_serie = (data.get("nro_serie") or "").strip()
-        imp.sucursal_id = data.get("sucursal") or None
-        imp.conexion  = data.get("conexion") or ""
-        ip          = data.get("ip") or ""
-        imp.propiedad = data.get("propiedad") or ""
-        imp.activa    = _bool(data.get("activa"))
-        imp.ubicacion = (data.get("ubicacion") or "").strip()
-        imp.notas     = (data.get("notas") or "").strip()
-        imp.toner     = data.get("toner") or ""
+
+        imp.marca        = (data.get("marca") or "").strip()
+        imp.modelo       = (data.get("modelo") or "").strip()
+        imp.nro_serie    = (data.get("nro_serie") or "").strip()
+        imp.sucursal_id  = data.get("sucursal") or None
+        imp.conexion     = data.get("conexion") or ""
+        imp.ip           = (data.get("ip") or "").strip()
+        imp.propiedad    = data.get("propiedad") or None   # None si no selecciona
+        imp.activa       = _to_bool(data.get("activa"))    # destildado => False
+        imp.ubicacion    = (data.get("ubicacion") or "").strip()
+        imp.notas        = (data.get("notas") or "").strip()
+        imp.toner        = data.get("toner") or ""
 
         try:
-            imp.full_clean()
+            imp.full_clean()  # valida choices, null/blank, etc.
             imp.save()
         except IntegrityError:
             messages.error(request, "Ya existe una impresora con ese N° de serie.")
-            return render(request, "soporte/inventario/impresora_edit.html", {"sucursales": sucursales, "imp": imp, "mode": "edit"})
+            return render(
+                request,
+                "soporte/inventario/impresora_edit.html",
+                {"sucursales": sucursales, "imp": imp, "mode": "edit", "choices_propiedad": choices_propiedad},
+            )
+        except ValidationError as e:
+            # Muestra errores campo a campo
+            for field, errs in e.message_dict.items():
+                for err in errs:
+                    messages.error(request, f"{field}: {err}")
+            return render(
+                request,
+                "soporte/inventario/impresora_edit.html",
+                {"sucursales": sucursales, "imp": imp, "mode": "edit", "choices_propiedad": choices_propiedad},
+            )
         except Exception as e:
             messages.error(request, f"Error: {e}")
-            return render(request, "soporte/inventario/impresora_edit.html", {"sucursales": sucursales, "imp": imp, "mode": "edit"})
+            return render(
+                request,
+                "soporte/inventario/impresora_edit.html",
+                {"sucursales": sucursales, "imp": imp, "mode": "edit", "choices_propiedad": choices_propiedad},
+            )
 
         messages.success(request, "Impresora actualizada.")
         return redirect("inventario:impresora_list")
 
-    return render(request, "soporte/inventario/impresora_edit.html", {"sucursales": sucursales, "imp": imp, "mode": "edit","imp.toner": imp.toner})
+    return render(
+        request,
+        "soporte/inventario/impresora_edit.html",
+        {"sucursales": sucursales, "imp": imp, "mode": "edit", "choices_propiedad": choices_propiedad},
+    )
 
 @login_required
 @permission_required("inventario.delete_impresora", raise_exception=True)
