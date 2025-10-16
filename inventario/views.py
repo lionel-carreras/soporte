@@ -79,7 +79,7 @@ def impresora_list(request):
         qs = qs.filter(activa=(activa == "1"))
     if conexion in ("IP", "USB"):
         qs = qs.filter(conexion=conexion)
-    if propiedad in ("PROPIA", "ALQUILER"):
+    if propiedad in ("PROPIA", "ALQUILER","REPARACION"):
         qs = qs.filter(propiedad=propiedad)
 
     page_obj = Paginator(qs, 15).get_page(request.GET.get("page"))
