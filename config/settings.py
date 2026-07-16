@@ -20,21 +20,31 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-a&1jb%*vxiv@mh4l@o8n-289_01mlgak7re*q4h_827ukcn0o!'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'build-only-not-for-production')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DJANGO_DEBUG', 'false').lower() in ('1', 'true', 'yes')
 
 ALLOWED_HOSTS = [
-    os.environ.get("WEBSITE_HOSTNAME", ""),
-    "localhost",
-    "127.0.0.1",
-    "192.168.0.140",
+    host.strip()
+    for host in os.environ.get(
+        'DJANGO_ALLOWED_HOSTS',
+        'localhost,127.0.0.1,192.168.100.51,soporte.expresobrio.com',
+    ).split(',')
+    if host.strip()
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    f"https://{ os.environ.get('WEBSITE_HOSTNAME', '') }",
+    origin.strip()
+    for origin in os.environ.get(
+        'DJANGO_CSRF_TRUSTED_ORIGINS',
+        'https://soporte.expresobrio.com',
+    ).split(',')
+    if origin.strip()
 ]
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
 
 
 # Application definition
@@ -93,10 +103,10 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE':   'django.db.backends.mysql',
-        'NAME':     os.environ.get('DB_NAME',     'soportebrio-database'),
-        'USER':     os.environ.get('DB_USER',     'jdwrnxssio'),
-        'PASSWORD': os.environ.get('DB_PASSWORD', 'r2fIm7ciKbhU$PVu'),
-        'HOST':     os.environ.get('DB_HOST',     'soportebrio-server.mysql.database.azure.com'),
+        'NAME':     os.environ.get('DB_NAME', ''),
+        'USER':     os.environ.get('DB_USER', ''),
+        'PASSWORD': os.environ.get('DB_PASSWORD', ''),
+        'HOST':     os.environ.get('DB_HOST', ''),
         'PORT':     os.environ.get('DB_PORT',     '3306'),
         'OPTIONS': {
 
@@ -167,6 +177,6 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # Azure Web PubSub connection string
-AZURE_WEBPUBSUB_ENDPOINT   = "https://noti-ticket.webpubsub.azure.com"
-AZURE_WEBPUBSUB_ACCESS_KEY = "3FnAl5ZGkyrCIhX7ARa5geTpTVJh7azmKnndSO0XLkphZe9cnlHlJQQJ99BFACYeBjFXJ3w3AAAAAWPSRVq3"
-AZURE_WEBPUBSUB_HUB        = "alerts"
+AZURE_WEBPUBSUB_ENDPOINT = os.environ.get('AZURE_WEBPUBSUB_ENDPOINT', '')
+AZURE_WEBPUBSUB_ACCESS_KEY = os.environ.get('AZURE_WEBPUBSUB_ACCESS_KEY', '')
+AZURE_WEBPUBSUB_HUB = os.environ.get('AZURE_WEBPUBSUB_HUB', 'alerts')

@@ -21,4 +21,5 @@ urllib3==2.4.0
 whitenoise==6.9.0
 mysqlclient>=2.1
 qrcode[pil]>=7.4
+gunicorn==23.0.0
 

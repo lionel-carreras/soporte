@@ -46,6 +46,7 @@ coverage.xml
 venv/
 .venv/
 .env/
+.env
 
 # Django stuff:
 *.log
