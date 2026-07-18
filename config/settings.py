@@ -100,21 +100,27 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 
 
-DATABASES = {
-    'default': {
-        'ENGINE':   'django.db.backends.mysql',
-        'NAME':     os.environ.get('DB_NAME', ''),
-        'USER':     os.environ.get('DB_USER', ''),
-        'PASSWORD': os.environ.get('DB_PASSWORD', ''),
-        'HOST':     os.environ.get('DB_HOST', ''),
-        'PORT':     os.environ.get('DB_PORT',     '3306'),
-        'OPTIONS': {
-
-            'ssl_mode': 'REQUIRED',
-
-        },
+if os.environ.get('DB_ENGINE', 'mysql').lower() == 'sqlite':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.environ.get('SQLITE_PATH', BASE_DIR / 'data/db.sqlite3'),
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.environ.get('DB_NAME', ''),
+            'USER': os.environ.get('DB_USER', ''),
+            'PASSWORD': os.environ.get('DB_PASSWORD', ''),
+            'HOST': os.environ.get('DB_HOST', ''),
+            'PORT': os.environ.get('DB_PORT', '3306'),
+            'OPTIONS': {
+                'ssl_mode': 'REQUIRED',
+            },
+        }
+    }
 
 
 # Password validation
